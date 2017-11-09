@@ -1,97 +1,126 @@
-# Title
+# Turing research from the perspective of a machine
 
 The Alan Turing Institute brings together researchers from a wide range of disciplines.
-While it is easy to find out what any individual researcher is working on, it is not as easy to find out and summarize how they all compare to each other, what they have in common and what differentiates one Turing fellow from another. As a data science team, we wanted to see whether we could develop a (mostly) automated method of answering this question by analysing the Turing fellows' publications (from the last 5 years) for research themes and topics using only open access tools.
+A common question is therefore: 'what kind of research happens at the Turing?'
+Although it is simple to find out the interests of any given researcher by talking to them, it is more complex to summarise the overarching research themes at the institute.
+Different researchers will describe the same topic using different words, or perhaps neglect to mention the link between an aspect of their work and a particular field.
+Since the Turing seeks to promote collaboration between researchers, it is important that the members of the institute can identify how they are similar to (and how they are different from) their colleagues, so that opportunities for novel collaborations can emerge.
+As an internal project, the Data Science team has developed a tool for this purpose.
+Data Science has produced a wide variety of tools for Natural Language Processing (NLP), meaning that an automated approach is possible.
+The purpose of the project, then, is to examine the research topics at the Turing from the perspective of a computer.
 
-The results are summarized in the below visualisation. The list of discovered research topics is ordered by topic size (i.e., the proportion of publications that were labeled as belonging to that topic).
-Each circle represents a Turing fellow and the segment widths also correspond to topic sizes.
-The coloured areas represent the proportion of each Turing fellow's work that, according to our algorithm, touches on each of the identified topics.
-While there is a lot of information packed into the single visualisation, it allows for drawing the kind of comparisons we were interested in.
-That is, identifying similarities and differences between individual researchers but also summarizing expertise across the entire institute.
+A popular approach to 'topic analysis' (the process of extracting themes from text) is *Latent Dirichlet Allocation* (LDA).
+Consequently, we applied this method to five years of research output from members of the Turing, in the form of research papers.
+The results are summarized in the visualisation below.
+The list of inferred research topics on the left hand side is ordered by topic size (i.e., the proportion of publications that the algorithm related to that topic).
+Each circle in the diagram represents a Turing fellow.
+The widths of the segments are the same between fellows, and are also proportional to the topic prevalence across all of the research papers analysed.
+The coloured areas represent the proportion of a particular Turing fellow's work that touches upon each of the identified topics.
+The diagram allows for a quick comparison between fellows.
+If two fellows have similar visualisations, then their research is likely to have shared themes.
+The key on the left (and the widths of each segment), provide an overall view of the research taking place at the Turing.
 
 ![](visualisation/turing_fellows_topics.png)  
-*Note: Turing fellows represented in grey are those for whom we did not manage to download a sufficient number of articles.*
+*Note: Turing fellows represented in grey are those for whom the number of openly available research articles was insufficient to reliably infer their research topics.*
 
 ### What data?
 
-Quite unsurprisingly, the greatest challenge in this project was not what we initially expected it to be and that was collecting sufficient publications data for all Turing fellows.
-More specifically, the challenge was finding a reliable, automated method (or requiring as little manual effort as possible) using tools and resources that are not behind a paywall but that are broad enough to target researchers from a wide range of research disciplines.
-Whenever I bring up this problem with physicists or mathematicians, for example, they always mention platforms such as arXiv but unfortunately it is not used by all research disciplines and equivalents don't as yet exist in all research fields.
-We run into similar and other problems with a whole range of what might otherwise seem as obvious approaches (for example, Google Scholar does not have an API).
+As is typical in many data science projects, a challenge of this project was the acquisition and cleaning of relevant data.
+More specifically, the challenge was finding a reliable, automatic method for obtaining academic publications through public APIs.
+We used Microsoft’s [Academic Knowledge (AK) API](https://docs.microsoft.com/en-us/azure/cognitive-services/academic-knowledge/home), which is a free service for searching academic publications.
+Some manual work is required due to entity matching issues: Turing researchers may identify themselves in a variety of ways in a publication (e.g., John Smith, or J. Smith, or John A. Smith may all correspond to the same individual).
+However, once this small amount of manual work is completed, the API provides a list of publications for each researcher.
+We hope to make the process entirely automated by solving the entity matching issue (but this is not trivial, and is a very interesting data science problem in itself).
 
-Identifying who Turing fellows are is easy, they are all listed on the Turing website and a simple web-scrape can quickly generate a table of all Turing fellows as well as the University they are affiliated with.
-Despite a fair amount of effort, we did not manage to construct a generalized web-scraper that would also retrieve a list of publications for each fellow.
-Instead, we used Microsoft’s [Academic Knowledge (AK) API](https://docs.microsoft.com/en-us/azure/cognitive-services/academic-knowledge/home) which is a free service for searching academic publications.
-There was some manual work involved as we had to determine how each fellow was stored in the AK database.
-However, once we had a means of identifying each Turing fellow specifically (making sure we are not retrieving publications for other researchers, with the same name for example), writing a script that makes a request to the AK API for a list of publications for each Turing fellow was straightforward and fairly quick.
-This currently remains the best method we found of gathering this information (although I'd love to hear of alternatives!).
-
-The AK database returns article title and in some instances also article abstract, article DOI and a list of source URLs (links to a range of content from only the article abstract to full text versions of the article).
-The returned source URLs provided a means of downloading at least a subset of the identified articles.
-Further, we used the article DOI (where available) to extract a further set of source links from the [oaDOI API](https://oadoi.org).
-A short script simply visited each of the identified URLs and if the retrieved content was a PDF, we downloaded it. In this way we collated a dataset of over 1800 articles.
+Once the AK API has been queried, a list of article titles and source URLs is returned per researcher.
+Occasionally, a second API (the [oaDOI API](https://oadoi.org)) must be queried using the article DOI (Digital Object Identifier) in order to find a URL from which the article can be downloaded.
+The output of this procedure is a collection of PDF files, each corresponding to a publication from one of the Turing fellows.
+Given the present collection of Turing fellows, the dataset is composed of around 1800 articles.
 
 ### Identifying research topics
 
-In terms of typical text data analysis projects, a collection of 1800 documents is not considered a large dataset.
-However, it is clear that even without requiring to read the entire article, manually searching through each of the downloaded texts for keywords, for example, would be extremely time consuming and inefficient.
-Topic modelling is a statistical approach to discovering a set of ‘topics’ in a collection of documents by analysing the words within the texts and their frequency of co-occurrence. It is quite remarkable that these models extract what is generally recognizable as 'topics' using a very simple idea of what language is and how it is used.
+Topic modelling is a statistical approach to discovering a set of themes in a collection of documents.
+In our context, these themes are research areas.
+This is done by analysing the frequency with which different words appear in those documents.
+It is quite remarkable that these relatively simple models extract topics that make intuitive sense to humans.
 
-The most commonly used topic modelling method is Latent Dirichlet Allocation (LDA). LDA is a probabilistic generative model; it assumes a generative process that describes how documents are written given a collection of topics and then tries to reverse that process i.e., infer topics that could have generated a given set of documents.
-To understand the generative process, lets imagine we have 2 topics: the Czech Republic and Great Britain, and we want to write a document that is mostly about the Czech Republic but that also compares it to Britain.
-Further, we have 4 words in our vocabulary: British, Czech, weather, beer. For LDA, a topic is simply a probability distribution over our entire vocabulary.
-For example:   
+As mentioned in the introduction, a commonly used topic modelling method is *Latent Dirichlet Allocation* (LDA).
+LDA is as *generative* model: that is, the method provides a process by which new documents can be generated.
+To understand the generative process, imagine that we have 2 topics: `the Czech Republic` and `Great Britain`, and we want to write a document that is mostly about `the Czech Republic` and also refers to `Britain`, but less frequently (i.e., `the Czech Republic` is the *dominant* topic in the document).
+Furthermore, we have 4 words in our vocabulary: `British`, `Czech`, `weather` and `beer`.
+In the context of LDA, a topic is simply a probability distribution over the vocabulary: some words are likely to belong to a given topic (e.g., we might expect the word `Czech` to have a high chance of relating to the topic `the Czech Republic`).
+Example topic distributions might be   
 
-|                  | British | Czech   | weather | beer    |
+|                  | `British` | `Czech`   | `weather` | `beer`    |
 | ---------------- |:-------:| -------:| -------:| -------:|
-| Topic **Britain**    |   .5    |   .0    |   .4    |   .1    |
-| Topic **Czech Rep.** |   .0    |   .5    |   .2    |   .3    |
+| `Britain`    |   0.8    |   0.0    |   0.1    |   0.1    |
+| `the Czech Republic` |   0.0    |   0.5    |  0.2    |   0.3    |
 
-Similarly, a document is a probability distribution over all of our topics:
+The word `British` has probability 0.8 of being written in the context of the `Britain` topic, but has a probability of 0.0 of being used in the context of `the Czech Republic`.
+Similarly, a document is a probability distribution over topics:
 
-|   | Britain | Czech Rep. |
+|   | `Britain` | `the Czech Republic` |
 |---|:-------:|:----------:|
-|Document| .2 | .8 |
+|Document| 0.2 | 0.8 |
 
+i.e., documents typically refer to `the Czech Republic` four times as often as `Britain` (perhaps the documents in our dataset come from a Czech library).
 
-According to LDA, if I want to write 10 words of the above defined document then for each word that I write:  
-1. I randomly choose a topic (and I should choose Topic Czech Rep. 80% of the time)  
-2. I randomly choose a word from that topic  
+According to LDA one uses the following procedure to compose a document:
 
-Following this two-step process for each word, I might generate something like:   
+1. **Choose a topic at random according to the document probabilities**: in this example, I would choose `the Czech Republic` 80% of the time.
+2. **Randomly choose a word from that topic**: that is, go to the row in the topic table (our first table) that corresponds to the selected topic and then select a word from the vocabulary according to the probabilities in that row. If the selected topic is `Britain`, then I pick the word `beer` 10% of the time. Conversely, if instead the topic is `the Czech Republic`, the word `beer` is selected 30% of the time.
 
->Czech beer Czech beer Czech beer Czech weather British weather.
+If a 10 word document is required, then I repeat this two-step process 10 times.
+In the current example, I might generate something like:   
 
-LDA tries to infer the original topics from a corpus of documents as well as the topic proportions for each document.
-As mentioned, the returned topics are simply distributions over the vocabulary. This means they require manual labelling for interpretation.
-In some sense it is misleading to talk about topics in this context and another term might be preferable.
-Especially as LDA as a model generalizes to other types of data (e.g., genetics, image processing, etc.) and has other uses than content analysis, such as dimensionality reduction (e.g. moving from vocabulary-length to topic-length vectors of features for each document, which in the case of this project is a reduction from some 63 000 to 25 features).
+`Czech beer Czech beer Czech beer Czech weather British weather`
 
-The topic labeling generally consists of looking at the top (usually most frequent or high probability) N words in each topic.
-The most frequent 5 words of a topic might be 'prior', 'distribution', 'posterior', 'sampling' and 'inference' and we would label that topic as 'Bayesian statistics’.
-However, many of the most frequent words in a topic are also the most frequent words in all texts and appear in many topics. In our case these were words such as 'model'.
-We therefore also looked at words that were not necessarily the most frequent but that were unique to a topic.
-Lastly, we also extracted the titles of articles that were assigned the highest proportion of a given topic.
-Especially the last step helped to interpret the returned topics as it provided context for the topic words (which were often less clearcut than is usually suggested in the examples you see in the literature).
+Notice that LDA does not pay attention to the *order* of words in the document.
+It simply generates the words that appear in the document.
+For example, the following two documents are identical in the context of LDA:
+
+`I like Czech beer`  
+`beer Czech like I`.
+
+Models of language that have this property are referred to as *bag of words* models.
+
+When presented with a set of documents, LDA can be used to *infer* the topics that are present in the documents, as well as the topic proportions for each document.
+In other words, the algorithm can be used in the reverse sense to the generative procedure described above: given some documents, infer the topics (as opposed to being given some topics and generating some documents).
+The inferred topics must be interpreted by a human.
+In the example above, one would examine the topic table and see that `Czech` and `beer` are frequently used in the context of one of the topics.
+Given our knowledge of the world, we *interpret* this topic as relating to `the Czech Republic`, and therefore give the topic this name.
+Then, when analysing future documents, we can say things like 'this document is about the Czech republic'.
+In practise, one gives topics names by examining the *top N* most probable words for each topic (where N is chosen by hand, say 5), since the vocabulary may be very large.
+For example, the most 5 frequent (probable) words in a topic might be `prior`, `distribution`, `posterior`, `sampling` and `inference` and we would label that topic as `Bayesian statistics`.
+An issue that we have encountered is that topics may have probable words in common with one another.
+In our case these were words such as `model`.
+Consequently, we instead examined words that were *relatively common* in a topic, meaning that their frequency in a given topic was significantly higher than it was across the other inferred topics.
+We also extracted the titles of articles that were assigned the highest proportion of a given topic.
 Using a combination of these approaches, we came up with the topic labels listed in the final visualisation.
 
 ### Comments
 
-The original plan was to analyse only article abstracts but LDA did not seem to do well on what was quite a small collection of short texts so we decided to target full text articles.
-I know of a project that has successfully used only article abstracts with LDA but their data set was much larger (in terms of the number of documents) and their goals quite different to ours.
-In all fairness, it is not really surprising that a small collection of short texts might not be sufficient for the model to do well. It is also true that all the classic LDA examples come from large collections of articles and this might be the ideal setting for using LDA for text analysis, although I did not find much discussion of this in the literature.
-Overall, the LDA results were pretty impressive once we started using full articles.
+In this section, we provide miscellaneous comments regarding the implementation and usage of LDA that readers might find useful.
 
-Implementing LDA as a model (in Python or R for example) is well described in the literature and on various blogs with many ready-to-use implementations out there.
-The hardest aspect of using LDA was topic interpretation and labeling.
-The examples in the literature are much more well defined than some of our results.
-For some topics looking at frequent words was enough but it really made a large difference for this project once we also looked at titles of articles that were labeled as having the highest proportion of a given topic.
-This gave us context for the retrieved topic words. In the end we pooled quite a lot of information about the retrieved texts in addition to the returned topics to come up with labels that were interpretable and meaningful.
+Originally, we had planned to use only the abstracts to articles rather than the full text.
+However, we found that LDA performed significantly better when applied to full articles (that is, the topics were more interpretable, and topic proportions less noisy).
+However, as part of our literature review, we found a project that successfully used only article abstracts with LDA, but their dataset contained many more documents than ours.
+It may be the case, therefore, that *overall word count* is an important metric when using LDA, rather than the number of documents or number of words per document.
+It is also true that all the classic LDA examples come from large collections of articles and this might be the ideal setting for using LDA for text analysis, although we did not find much discussion of this in the literature (**is this surprising? Most algorithms work better when they have more data**).
+Overall, we were impressed with the results of LDA when applied to the full articles.
 
-We collapsed the smallest topics into a single 'other' topic but even so we were left with 15 topics of the original modelled 25 to visualise for over a 120 Turing fellows.
-There are always going to be issues with trying to represent as much information as we tried to put into a single graphic.
-Some information inevitably always ended up being a little distorted.
-Nevertheless, while I did not expect to ever find myself opting for any variant of a pie chart as a means of displaying information, I do believe that in this case, surprisingly, it works pretty well.
-This was probably the most surprising part of the whole project.
+Practically implementing LDA as a model (in Python or R, for example) is well described in the literature and on various blogs, with many ready-to-use implementations available.
+The hardest aspect of using LDA was instead topic interpretation and labelling.
+The examples in the literature tend to be quite idealised, and produce very distinct topics by comparison to our results.
+For some topics, looking at frequent words was enough to reasonably interpret their meaning.
+However, it was significant for this project to also look at titles of articles that were labelled as having the highest proportion of a given topic, because it gave us a solid context for the retrieved topic words.
+In the end, it was necessary to gather a lot of information about the retrieved texts in addition to the returned topics, in order to come up with labels that were interpretable and meaningful.
+In this sense, we found that significant human input was required to make LDA a worthwhile procedure.
+This is likely because the topics in our particular application are highly specialised and quite subtle.
 
-All code can be found on [GitHub](https://github.com/alan-turing-institute/ati_tm)
+The final challenge relating to this project was the production of an effective visualisation of the results.
+We collapsed the least frequent topics into a single `other` topic but, even so, we were left with 15 topics to visualise for over 120 Turing fellows.
+This is a lot of information to convey in a single visualisation.
+While we did not expect to ever find ourselves opting for any variant of a pie chart as a means of displaying information, we found them to be most useful in this case!
+
+All of the code to reproduce this work can be found on [GitHub](https://github.com/alan-turing-institute/ati_tm).
