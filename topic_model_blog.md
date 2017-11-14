@@ -124,5 +124,5 @@ We collapsed the least frequent topics into a single `other` topic but, even so,
 This is a lot of information to convey in a single visualisation.
 While we did not expect to ever find ourselves opting for any variant of a pie chart as a means of displaying information, we found them to be most useful in this case!
 
-All of the code to reproduce this work can be found on [GitHub](https://github.com/alan-turing-institute/ati_tm).
-s
+All of the code to reproduce this work can be found on [GitHub](https://github.com/alan-turing-institute/ati_tm).  
+The visualisation is an adaptation of the [aster plot](http://bl.ocks.org/bbest/2de0e25d4840c68f2db1).
