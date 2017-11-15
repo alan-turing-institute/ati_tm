@@ -79,6 +79,10 @@ div{
     transition: all 0.3s;
 }
 
+/*.solidArc:hover {
+  fill: #d3d3d3;
+}*/
+
 .x.axis path {
   display: none;
 }

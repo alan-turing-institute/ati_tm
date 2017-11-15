@@ -10,11 +10,20 @@ var pie = d3.layout.pie()
     .sort(null)
     .value(function(d) { return d.width; });
 
+//set up for displaying topic names on hover
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([0, 0])
+  .html(function(d) {
+    return "<font size='5'>" + topics[d.data.label] + "</font>";
+  });
+
 //define arc -- used to draw inner coloured segments
 //based primarily on 'score' which is author's proportion of topic
 var arc = d3.svg.arc()
   .innerRadius(innerRadius)
   .outerRadius(function (d) {
+
     //(i) return radius based on score weighted area that want to colour
     theta = (d.data.topicVal/100)*(2*Math.PI)
     area = 100*d.data.score //100 is arbitarily chosen as max area
@@ -66,28 +75,35 @@ var topics = ['Social and Applied DS', 'Mathematics Statistics', 'NLP', 'Applica
 var Colors = ['#45666d','#8cb2b0','#c0dac9','#f9dca2','#ffaf7a','#e77d65','#bf5458',
               '#8d3647','#572031','#000000','#424B54', '#898987','#c2bcb0','#e2d4b7']
 
-//color and name topics in left topics panel
+//color and name of topics in left panel
 for (i=1; i<=topics.length+1; i++){
   id = 'topic-' + String(i)
   document.getElementById(id).style.backgroundColor = Colors[i-1];
   document.getElementById(id).innerHTML = '<h6>' + topics[i-1] + '</h6>'
 }
 
-//create TF plots; use let to deal with asynchronicity
+//create TF plots, one for each researcher;
+//use 'let' to deal with asynchronicity
 for (let i=0; i<names_ordered.length; i++){
 
+  //retrieve basic info
   chartName = "chart" + String(i);
   fellow = names_ordered[i];
   uni = author_info[fellow][1];
   counts[uni] += 1
   position_div = "#" + uni[0] + String(counts[uni])
 
+  //create a new svg element for each chart
   charts[chartName] = d3.select("#" + uni).select(position_div).append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+  //activate tooltips hover effect
+  charts[chartName].call(tip);
+
+  //loop through data and populate chart
   d3.csv('data_other.csv', function(error, data){
     chartName = "chart" + String(i);
     fellow = names_ordered[i];
@@ -112,7 +128,9 @@ for (let i=0; i<names_ordered.length; i++){
       .attr("fill", function(d) { return d.data.color; })
       .attr("class", "solidArc")
       .attr("stroke", "#e8e8e8")
-      .attr("d", arc);
+      .attr("d", arc)
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide);
 
     //draw outline arc
     charts[chartName].selectAll(".outlineArc")
