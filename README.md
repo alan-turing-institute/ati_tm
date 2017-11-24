@@ -42,6 +42,6 @@ Results (topic proportions by researcher, used for visualisation purposes): [dat
 
 5: Visualisation (see visualisation folder for details)
 
-A visualisation of the final topics was built using D3.js, relying on the results file generated in the previous step (see visualisation folder)   
+A visualisation of the final topics was built using D3.js and an adaptation of the [aster plot](http://bl.ocks.org/bbest/2de0e25d4840c68f2db1), relying on the results file generated in the previous step (see visualisation folder)   
 
 ![](visualisation/turing_fellows_topics.png)
