@@ -55,9 +55,9 @@ function get_json(url){
 }
 
 //get author information from json file - full name, university + whether to mark in grey
- var author_info = get_json('author_info.json')
+ var author_info = get_json('author_info_original.json')
 //get order in which to display researchers
-var names_ordered = get_json('author_order.json')
+var names_ordered = get_json('author_order_original.json')
 
 //empty charts array that will populate
 var charts = {}
@@ -65,9 +65,9 @@ var charts = {}
 var counts = {"Cambridge":0, "Edinburgh":0, "Oxford":0, "UCL":0, "Warwick":0}
 
 //names of topics in order
-var topics = ['Social and Applied DS', 'Mathematics Statistics', 'NLP', 'Applications to science', 'Optimization',
-              'ML', 'Bayes, MC methods, Markov models', 'Biology, Genetics', 'Networks (wireless, routing, sensor)', 'Networks (social, temporal, fmri)',
-              'Knowledge representation (semantic web)', 'Privacy and Security', 'Approximation methods', 'Other' ]
+var topics = ['Social and Applied DS', 'Mathematics and Statistics', 'Natural Language Processing', 'Applications to science', 'Optimization',
+              'Machine Learning', 'Bayesian methods', 'Biology and Genetics', 'Networks (routing, wireless)', 'Networks (modelling)',
+              'Knowledge representation', 'Privacy and Security', 'Approximation methods', 'Other' ]
 
 //see https://coolors.co/browser/latest/1 for ideas
 //used https://gka.github.io/palettes
@@ -104,7 +104,7 @@ for (let i=0; i<names_ordered.length; i++){
   charts[chartName].call(tip);
 
   //loop through data and populate chart
-  d3.csv('data_other.csv', function(error, data){
+  d3.csv('data_original.csv', function(error, data){
     chartName = "chart" + String(i);
     fellow = names_ordered[i];
     data.forEach(function(d) {

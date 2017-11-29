@@ -17,10 +17,10 @@ http://contentmine.github.io
 
 ```shell
 cd papers
-for fname in *.pdf; 
-do 
-filename=$(basename "$fname"); filename="${filename%.*}"; 
-mkdir "$filename"; mv "$fname" "$filename"/fulltext.pdf; 
+for fname in *.pdf;
+do
+filename=$(basename "$fname"); filename="${filename%.*}";
+mkdir "$filename"; mv "$fname" "$filename"/fulltext.pdf;
 done
 ```
 
@@ -29,4 +29,10 @@ done
 ```shell
 cd ..
 norma --project papers/ -i fulltext.pdf -o fulltext.txt --transform pdf2txt
+```
+
+If that does not work might first need to link to where downloaded NORMA i.e., something like this:
+
+```shell
+export PATH=$PATH:~/Documents/norma-0.1-SNAPSHOT/bin
 ```
