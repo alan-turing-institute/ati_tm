@@ -1,5 +1,7 @@
 # Turing Institute research from the perspective of a machine
 
+1<sup>st</sup> December 2017
+
 The Alan Turing Institute brings together researchers from a wide range of disciplines.
 Although it is relatively easy to find out what any individual researcher is working on, it is harder to summarize the overarching research themes of the Institute.
 A common question we hear is: What exactly does the Turing do?
@@ -9,27 +11,27 @@ Academic research is fairly well suited to analysis.
 Academics publish a large number of articles, which means there is a great quantity of data about each researcher and a lot of it is freely available as open access is becoming increasingly popular.
 Additionally, data science has produced a wide variety of powerful tools for analysis of text data and this includes methods for extracting themes or topics from large collections of texts.
 
-The figure presents topics extracted from the last five years of research articles published by Turing fellows .
+The figure below presents topics extracted from the last five years of research articles published by Turing fellows.
 The rest of this blog outlines the process of going from research articles to this visualisation.
 For now, note that each circle is a Turing fellow and the coloured segments reflect research topics.
 The list of topics on the left provides a key to interpreting the individual research profiles and it gives an overall view of the research expertise at the Turing.
 The diagram also allows for a quick comparison between fellows; if two fellows have a similar visualisation, then their research is likely to have shared themes (although notice that some of these themes are quite broad).
 
 ![](visualisation/turing_fellows_topics.png)
-*The figure represents Turing Fellows who were listed on the Turing Institute website in September 2017 - some current Turing Fellows are thus missing*
+*The figure represents Turing Fellows who were listed on the Turing Institute website in October 2017 - some current Turing Fellows are thus missing*
 
 ### Identifying research topics
 
-One of the classic approaches to text data analysis is topic modelling.
-Topic models are a set of algorithms developed for discovering "topics" in a collection of documents.
-In the context of this project, that means research topics in a collection of research articles.
+Algorithms developed for discovering "topics" in a collection of documents are called topic models.
 Broadly, topic models try to capture a general intuition that documents about some topic use certain words more frequently than others.
+The most basic representation of a language is its vocabulary.
+Correspondingly, the most commonly used method of representing documents in analysis is as counts of how many times each word in the vocabulary appears in each document (the so-called bag-of-words model).
+Remarkably, these relatively simple models, which ignore meaningful language features such as word order, seem to work pretty well.
 
-The most basic representation of a language, commonly used in text data analysis, is its vocabulary.
-In this context, a topic is simply a probability distribution over our vocabulary.
+In this context, a topic is defined as a probability distribution over our vocabulary.
 To be more specific, lets imagine I only have 4 words in my vocabulary: `British`, `Czech`, `weather` and `beer`.
 I could define any number of topics as distributions over that vocabulary.
-Here is an example of two topics:
+As an example, lets consider these two topics:
 
 |                  | `British` | `Czech`   | `weather` | `beer`    |
 | ---------------- |:-------:| -------:| -------:| -------:|
@@ -71,7 +73,7 @@ Then, when analysing future documents, I can say things like 'this document is a
 ### Challenges
 
 As mentioned at the beginning, the research topics displayed in the figure are a result of applying LDA to articles written by Turing fellows.
-Originally, the plan was to use only the article abstracts rather than the full texts, as these are easier to obtain.
+Originally, the plan was to use only article abstracts rather than full texts, as these are easier to obtain.
 However, in the context of this project, LDA performed significantly better when applied to full articles.
 That is, the topics were more interpretable.
 This is really not too surprising given the dataset was quite small.
@@ -86,9 +88,9 @@ Research articles overall tend to follow certain structures and vocabulary that 
 
 The final challenge was creating an effective visualisation of the topics.
 The least frequent topics were collapsed into a single *other* topic.
-Even so, this left 15 topics (from the originally modelled 25) to visualise for over 120 Turing fellows.
+Even so, this left 14 topics (from the originally modelled 25) to visualise for almost 100 Turing fellows.
 This is a lot of information to convey in a single visualisation.
-To be honest, I did not expect to ever find myself opting for any variant of a pie chart as a means of displaying information.
+I did not expect to ever find myself opting for any variant of a pie chart as a means of displaying information.
 However, I do believe that, in this case, it works well.
 This was probably the most surprising part of the whole project.
 
@@ -102,11 +104,13 @@ Overall, LDA offers a useful method of analysing and clustering text data.
 Especially if you do not know much about the text data to begin with.
 It gave us a tool for making quick comparisons between Turing fellows and learning something about the Institute.
 However, one feature of the dataset was that the first few topics always came out as very broad and large.
-For example, there is a wide variety of research that falls under the topic *Social and Applied Data Science* that a human would want to unpack.
+For example, there is a wide variety of research that falls under the topic *Social and Applied Data Science* that one might want to unpack.
 Further, this entire exercise is only ever backward looking.
 The key motivation behind an Institute such as the Turing is to promote new, interdisciplinary research in a still very young research field.
-Clearly, none of that is captured in the current analysis.
+Clearly, not much of that is captured in the current analysis.
 The really interesting exercise will be repeating this once the Institute has been around for at least 5 years.
 Then we should be able to say what *Data Science the Turing way* really is.
 
 All of the code to reproduce this work can be found on [GitHub](https://github.com/alan-turing-institute/ati_tm).
+
+*By Radka Jersakova*

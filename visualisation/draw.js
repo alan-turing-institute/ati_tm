@@ -66,7 +66,7 @@ var counts = {"Cambridge":0, "Edinburgh":0, "Oxford":0, "UCL":0, "Warwick":0}
 
 //names of topics in order
 var topics = ['Social and Applied DS', 'Mathematics and Statistics', 'Natural Language Processing', 'Applications to science', 'Optimization',
-              'Machine Learning', 'Bayesian methods', 'Biology and Genetics', 'Networks (routing, wireless)', 'Networks (modelling)',
+              'Machine Learning', 'Bayesian and MCMC methods', 'Biology and Genetics', 'Networks (routing, wireless)', 'Networks (modelling)',
               'Knowledge representation', 'Privacy and Security', 'Approximation methods', 'Other' ]
 
 //see https://coolors.co/browser/latest/1 for ideas
