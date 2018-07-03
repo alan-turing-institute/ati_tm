@@ -42,6 +42,6 @@ Results (topic proportions by researcher, used for visualisation purposes): [dat
 
 5: Visualisation
 
-A visualisation of the final topics was built using an adaptation of the [aster plot](http://bl.ocks.org/bbest/2de0e25d4840c68f2db1)  (see visualisation folder for details)
+A visualisation of the final topics was built using an adaptation of the [aster plot](http://bl.ocks.org/bbest/2de0e25d4840c68f2db1)  (see visualisation folder)
 
 ![](visualisation/turing_fellows_topics.png)
